@@ -2,12 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
-import {
-  collection,
-  query,
-  onSnapshot,
-  Timestamp,
-} from "firebase/firestore";
+import { collection, query, onSnapshot, Timestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -32,7 +27,7 @@ interface Product {
   name: string;
   price: number;
   halfPrice?: number;
-  quantity?: string;        // e.g., "500g", "2 pcs" — from DB
+  quantity?: string; // e.g., "500g", "2 pcs" — from DB
   description?: string;
   imageUrl?: string;
   imageUrls?: string[];
@@ -45,13 +40,13 @@ interface CartItem {
   name: string;
   price: number;
   halfPrice?: number;
-  quantity: number;         // user's selected count
+  quantity: number; // user's selected count
   portion: "half" | "full";
   description?: string;
   imageUrl?: string;
   imageUrls?: string[];
   isVeg: boolean;
-  serves?: string;          // optional: copy of Product.quantity
+  serves?: string; // optional: copy of Product.quantity
 }
 
 interface Category {
@@ -72,7 +67,9 @@ const DescriptionWithReadMore: React.FC<{ text: string }> = ({ text }) => {
 
   return (
     <div>
-      <p className={`text-sm text-gray-700 ${isExpanded ? "" : "line-clamp-3"}`}>
+      <p
+        className={`text-sm text-gray-700 ${isExpanded ? "" : "line-clamp-3"}`}
+      >
         {isExpanded ? text : `${text.slice(0, maxLength)}...`}
       </p>
       <button
@@ -88,7 +85,9 @@ const DescriptionWithReadMore: React.FC<{ text: string }> = ({ text }) => {
 // === Main Component ===
 const FastFoodCatalogue: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [productsByCat, setProductsByCat] = useState<Record<string, Product[]>>({});
+  const [productsByCat, setProductsByCat] = useState<Record<string, Product[]>>(
+    {}
+  );
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -149,7 +148,8 @@ const FastFoodCatalogue: React.FC = () => {
         (snapshot) => {
           const fetchedProducts: Product[] = snapshot.docs.map((docSnap) => {
             const data = docSnap.data();
-            const imageUrls = data.imageUrls || (data.imageUrl ? [data.imageUrl] : []);
+            const imageUrls =
+              data.imageUrls || (data.imageUrl ? [data.imageUrl] : []);
             return {
               id: docSnap.id,
               name: data.name || "Unnamed Product",
@@ -205,9 +205,10 @@ const FastFoodCatalogue: React.FC = () => {
   const handleAddToCart = () => {
     if (!selectedProduct) return;
 
-    const price = tempPortion === "half" 
-      ? (selectedProduct.halfPrice || selectedProduct.price / 2) 
-      : selectedProduct.price;
+    const price =
+      tempPortion === "half"
+        ? selectedProduct.halfPrice || selectedProduct.price / 2
+        : selectedProduct.price;
 
     const newItem: CartItem = {
       id: selectedProduct.id,
@@ -224,7 +225,9 @@ const FastFoodCatalogue: React.FC = () => {
     };
 
     setCart((prev) => {
-      const exists = prev.find((i) => i.id === newItem.id && i.portion === newItem.portion);
+      const exists = prev.find(
+        (i) => i.id === newItem.id && i.portion === newItem.portion
+      );
       if (exists) {
         return prev.map((i) =>
           i.id === newItem.id && i.portion === newItem.portion
@@ -243,7 +246,9 @@ const FastFoodCatalogue: React.FC = () => {
   const increaseQty = (id: string, portion: "half" | "full") =>
     setCart((prev) =>
       prev.map((i) =>
-        i.id === id && i.portion === portion ? { ...i, quantity: i.quantity + 1 } : i
+        i.id === id && i.portion === portion
+          ? { ...i, quantity: i.quantity + 1 }
+          : i
       )
     );
 
@@ -259,18 +264,26 @@ const FastFoodCatalogue: React.FC = () => {
     );
 
   const removeFromCart = (id: string, portion: "half" | "full") =>
-    setCart((prev) => prev.filter((i) => !(i.id === id && i.portion === portion)));
+    setCart((prev) =>
+      prev.filter((i) => !(i.id === id && i.portion === portion))
+    );
 
   const handleProceedToBuy = () => {
     if (cart.length === 0) return;
 
-    const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const totalAmount = cart.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
     const orderDetails = cart
       .map((item) => {
         const portionLabel = item.portion === "half" ? " (Half)" : " (Full)";
         const qtyLabel = item.quantity > 1 ? ` x${item.quantity}` : "";
-        const serves = item.serves && item.serves !== "1" ? ` [${item.serves}]` : "";
-        return `*${item.name}${portionLabel}${serves}${qtyLabel}* — ₹${(item.price * item.quantity).toFixed(2)}`;
+        const serves =
+          item.serves && item.serves !== "1" ? ` [${item.serves}]` : "";
+        return `*${item.name}${portionLabel}${serves}${qtyLabel}* — ₹${(
+          item.price * item.quantity
+        ).toFixed(2)}`;
       })
       .join("\n");
 
@@ -282,7 +295,7 @@ const FastFoodCatalogue: React.FC = () => {
     )}*\n\nPlease confirm my order.`;
 
     window.open(
-      `https://wa.me/918210936795?text=${encodeURIComponent(message)}`,
+      `https://wa.me/917369068632?text=${encodeURIComponent(message)}`,
       "_blank"
     );
 
@@ -301,13 +314,18 @@ const FastFoodCatalogue: React.FC = () => {
     return true;
   });
 
-  const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalAmount = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   const getImageArray = (product: Product): string[] => {
     if (product.imageUrls && product.imageUrls.length > 0) {
       return product.imageUrls.filter((url) => url && url.trim() !== "");
     }
-    return product.imageUrl && product.imageUrl.trim() !== "" ? [product.imageUrl] : ["/placeholder.svg"];
+    return product.imageUrl && product.imageUrl.trim() !== ""
+      ? [product.imageUrl]
+      : ["/placeholder.svg"];
   };
 
   const navigateImage = (direction: "prev" | "next") => {
@@ -322,17 +340,21 @@ const FastFoodCatalogue: React.FC = () => {
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-orange-50 to-white relative">
+    <section className="min-h-screen bg-liniear-to-b from-orange-50 to-white relative">
       {/* Header */}
-      <div className="flex flex-col items-center text-center py-10 bg-gradient-to-r from-red-100 via-orange-100 to-yellow-50">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-red-700">
-          QuickBite
-        </h1>
-        <h2 className="text-2xl md:text-4xl font-bold text-orange-700 mt-2">
-          Fast • Tasty • Fresh
+      <div className="flex flex-col items-center text-center py-4 bg-linear-to-r from-yellow-950 via-yellow-800 to-yellow-600">
+        <img src={"logo.png"} className="h-20 rounded-full" />
+        <h1 className="text-4xl md:text-6xl font-extrabold text-yellow-400">
+          #𝐖𝐓𝐅 𝐂𝐚𝐟𝐞'
+        </h1> 
+        <h2 className="text-2xl md:text-4xl font-bold text-white mt-2">
+          𝒲𝒽𝑒𝓇𝑒’𝓈 𝓉𝒽𝑒 𝒻𝑜𝑜𝒹
         </h2>
-        <p className="text-gray-600 max-w-2xl mt-3 text-sm md:text-lg">
+        <p className="text-yellow-100 max-w-2xl mt-3 text-sm md:text-lg">
           Craving something delicious? Order now!
+        </p>
+        <p className="text-yellow-50 max-w-2xl mt-1 text-xs md:text-md">
+          ~Accepting Online Order : 10:00 AM - 9:00 PM~
         </p>
       </div>
 
@@ -340,14 +362,18 @@ const FastFoodCatalogue: React.FC = () => {
       <div className="flex justify-center gap-3 py-4 bg-white shadow-sm sticky top-0 z-30">
         <Button
           variant={filter === "all" ? "default" : "outline"}
-          className={`flex items-center gap-2 ${filter === "all" ? "bg-red-600 hover:bg-red-700" : ""}`}
+          className={`flex items-center gap-2 ${
+            filter === "all" ? "bg-yellow-600 hover:bg-yellow-700" : ""
+          }`}
           onClick={() => setFilter("all")}
         >
           All
         </Button>
         <Button
           variant={filter === "veg" ? "default" : "outline"}
-          className={`flex items-center gap-2 ${filter === "veg" ? "bg-green-600 hover:bg-green-700" : ""}`}
+          className={`flex items-center gap-2 ${
+            filter === "veg" ? "bg-green-600 hover:bg-green-700" : ""
+          }`}
           onClick={() => setFilter("veg")}
         >
           <span className="w-4 h-4 border-2 border-green-600 bg-green-500 rounded-sm flex items-center justify-center">
@@ -357,7 +383,9 @@ const FastFoodCatalogue: React.FC = () => {
         </Button>
         <Button
           variant={filter === "nonveg" ? "default" : "outline"}
-          className={`flex items-center gap-2 ${filter === "nonveg" ? "bg-red-600 hover:bg-red-700" : ""}`}
+          className={`flex items-center gap-2 ${
+            filter === "nonveg" ? "bg-red-600 hover:bg-red-700" : ""
+          }`}
           onClick={() => setFilter("nonveg")}
         >
           <span className="w-4 h-4 border-2 border-red-600 bg-red-500 rounded-sm"></span>
@@ -368,15 +396,15 @@ const FastFoodCatalogue: React.FC = () => {
       {/* Layout */}
       <div className="flex flex-row w-full max-w-7xl mx-auto px-4 py-6 gap-6">
         {/* Sidebar */}
-        <aside className="w-28 sm:w-40 md:w-60 sticky top-28 h-[calc(100vh-8rem)] overflow-y-auto bg-orange-50 border-r rounded-xl shadow-sm p-3">
+        <aside className="w-24 sm:w-40 md:w-60 sticky top-28 h-[calc(100vh-8rem)] overflow-y-auto bg-linear-to-r from-yellow-500  to-yellow-50 border-r rounded-xl shadow-sm p-1">
           {categories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`flex flex-col items-center cursor-pointer rounded-xl p-3 mb-3 transition-all border ${
+              className={`flex flex-col items-center cursor-pointer rounded-xl px-10 py-2  mb-2 transition-all border ${
                 activeCategory === cat.id
-                  ? "bg-orange-100 border-orange-400 shadow-md"
-                  : "hover:bg-gray-50 border-transparent"
+                  ? "bg-orange-100 border-orange-400 shadow-lg "
+                  : "hover:bg-gray-50 border-transparent "
               }`}
             >
               <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-200 shadow-sm">
@@ -389,7 +417,7 @@ const FastFoodCatalogue: React.FC = () => {
                   }}
                 />
               </div>
-              <span className="text-xs sm:text-sm font-semibold text-center mt-2 uppercase">
+              <span className="text-xs sm:text-sm font-semibold text-center mt-1 uppercase">
                 {cat.name}
               </span>
             </div>
@@ -406,7 +434,10 @@ const FastFoodCatalogue: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {currentProducts.map((product) => {
-              const firstImage = product.imageUrls?.[0] || product.imageUrl || "/placeholder.svg";
+              const firstImage =
+                product.imageUrls?.[0] ||
+                product.imageUrl ||
+                "/placeholder.svg";
               return (
                 <Card
                   key={product.id}
@@ -446,11 +477,11 @@ const FastFoodCatalogue: React.FC = () => {
                       {product.name}
                     </h3>
                     <div className="mt-1 flex items-baseline gap-2 flex-wrap">
-                      <span className="text-xl font-bold text-red-600">
+                      <span className="text-xl font-bold text-green-600">
                         ₹{product.price}
                       </span>
                       {product.halfPrice && (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-md text-gray-500">
                           | Half: ₹{product.halfPrice}
                         </span>
                       )}
@@ -464,9 +495,12 @@ const FastFoodCatalogue: React.FC = () => {
       </div>
 
       {/* Product Dialog */}
-      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+      <Dialog
+        open={!!selectedProduct}
+        onOpenChange={() => setSelectedProduct(null)}
+      >
         {selectedProduct && (
-          <DialogContent className="max-w-full w-full h-full md:max-w-2xl md:h-auto md:max-h-[90vh] rounded-none md:rounded-2xl p-0 overflow-hidden">
+          <DialogContent className="max-w-full w-full h-auto md:max-w-2xl md:h-auto md:max-h-[60vh] rounded-none md:rounded-2xl p-0 overflow-hidden">
             <DialogHeader className="p-4 md:p-4 pb-0.5">
               <DialogTitle className="text-lg md:text-xl pr-10 flex items-center gap-2">
                 {selectedProduct.name}
@@ -487,12 +521,15 @@ const FastFoodCatalogue: React.FC = () => {
               <div className="relative w-full md:w-1/2 h-64 md:h-80 bg-gray-100 rounded-lg overflow-hidden shrink-0">
                 {(() => {
                   const images = getImageArray(selectedProduct);
-                  const currentImg = images[currentImageIndex] || "/placeholder.svg";
+                  const currentImg =
+                    images[currentImageIndex] || "/placeholder.svg";
                   return (
                     <>
                       <img
                         src={currentImg}
-                        alt={`${selectedProduct.name} - ${currentImageIndex + 1}`}
+                        alt={`${selectedProduct.name} - ${
+                          currentImageIndex + 1
+                        }`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           e.currentTarget.src = "/placeholder.svg";
@@ -527,17 +564,23 @@ const FastFoodCatalogue: React.FC = () => {
                 <div className="space-y-3">
                   {selectedProduct.description && (
                     <div>
-                      <DescriptionWithReadMore text={selectedProduct.description} />
+                      <DescriptionWithReadMore
+                        text={selectedProduct.description}
+                      />
                     </div>
                   )}
 
                   {/* Portion Selector */}
                   {selectedProduct.halfPrice && (
                     <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Portion:</p>
+                      <p className="text-sm font-medium text-gray-700 mb-2">
+                        Portion:
+                      </p>
                       <div className="flex gap-2">
                         <Button
-                          variant={tempPortion === "full" ? "default" : "outline"}
+                          variant={
+                            tempPortion === "full" ? "default" : "outline"
+                          }
                           size="sm"
                           className="flex-1"
                           onClick={() => setTempPortion("full")}
@@ -545,7 +588,9 @@ const FastFoodCatalogue: React.FC = () => {
                           Full Plate
                         </Button>
                         <Button
-                          variant={tempPortion === "half" ? "default" : "outline"}
+                          variant={
+                            tempPortion === "half" ? "default" : "outline"
+                          }
                           size="sm"
                           className="flex-1"
                           onClick={() => setTempPortion("half")}
@@ -557,27 +602,34 @@ const FastFoodCatalogue: React.FC = () => {
                   )}
 
                   {/* Serves (from DB) */}
-                  {selectedProduct.quantity && selectedProduct.quantity !== "1" && (
-                    <div className="mt-3">
-                      <p className="text-sm text-gray-600">
-                        <strong>Serves:</strong> {selectedProduct.quantity}
-                      </p>
-                    </div>
-                  )}
+                  {selectedProduct.quantity &&
+                    selectedProduct.quantity !== "1" && (
+                      <div className="mt-3">
+                        <p className="text-sm text-gray-600">
+                          <strong>Serves:</strong> {selectedProduct.quantity}
+                        </p>
+                      </div>
+                    )}
 
                   {/* Order Quantity */}
                   <div className="mt-4 flex items-center gap-3">
-                    <p className="text-sm font-medium text-gray-700">Order Quantity:</p>
+                    <p className="text-sm font-medium text-gray-700">
+                      Order Quantity:
+                    </p>
                     <div className="flex items-center border rounded-lg">
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9"
-                        onClick={() => setTempQuantity(Math.max(1, tempQuantity - 1))}
+                        onClick={() =>
+                          setTempQuantity(Math.max(1, tempQuantity - 1))
+                        }
                       >
                         <Minus size={14} />
                       </Button>
-                      <span className="w-12 text-center font-medium">{tempQuantity}</span>
+                      <span className="w-12 text-center font-medium">
+                        {tempQuantity}
+                      </span>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -590,17 +642,18 @@ const FastFoodCatalogue: React.FC = () => {
                   </div>
 
                   <div className="mt-3">
-                    <p className="text-2xl font-bold text-red-600">
+                    <p className="text-2xl font-bold text-green-600">
                       ₹
                       {tempPortion === "half"
-                        ? (selectedProduct.halfPrice || selectedProduct.price / 2) * tempQuantity
+                        ? (selectedProduct.halfPrice ||
+                            selectedProduct.price / 2) * tempQuantity
                         : selectedProduct.price * tempQuantity}
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 mt-5">
+                  <div className="flex flex-col sm:flex-row gap-3 mt-5 my-3">
                     <Button
-                      className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm md:text-base"
+                      className="flex-1 bg-yellow-500 hover:bg-yellow-700 text-white text-sm md:text-base "
                       onClick={handleAddToCart}
                     >
                       Add to Cart
@@ -616,7 +669,7 @@ const FastFoodCatalogue: React.FC = () => {
       {/* Floating Cart */}
       <div
         onClick={() => setCartOpen(true)}
-        className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-lg cursor-pointer transition-all z-40"
+        className="fixed bottom-6 right-6 bg-yellow-600 hover:bg-yellow-700 text-white p-4 rounded-full shadow-lg cursor-pointer transition-all z-40"
       >
         <ShoppingCart size={26} />
         {cart.length > 0 && (
@@ -630,14 +683,19 @@ const FastFoodCatalogue: React.FC = () => {
       <Dialog open={cartOpen} onOpenChange={setCartOpen}>
         <DialogContent className="max-w-lg rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle>Your Cart ({cart.reduce((s, i) => s + i.quantity, 0)} items)</DialogTitle>
+            <DialogTitle>
+              Your Cart ({cart.reduce((s, i) => s + i.quantity, 0)} items)
+            </DialogTitle>
           </DialogHeader>
           {cart.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">Your cart is empty.</p>
+            <p className="text-gray-500 text-center py-8">
+              Your cart is empty.
+            </p>
           ) : (
             <div className="flex flex-col gap-4 mt-3 max-h-96 overflow-y-auto">
               {cart.map((item) => {
-                const firstImage = item.imageUrls?.[0] || item.imageUrl || "/placeholder.svg";
+                const firstImage =
+                  item.imageUrls?.[0] || item.imageUrl || "/placeholder.svg";
                 return (
                   <div
                     key={`${item.id}-${item.portion}`}
@@ -665,9 +723,12 @@ const FastFoodCatalogue: React.FC = () => {
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold text-sm line-clamp-1">
-                          {item.name} ({item.portion === "half" ? "Half" : "Full"})
+                          {item.name} (
+                          {item.portion === "half" ? "Half" : "Full"})
                           {item.serves && item.serves !== "1" && (
-                            <span className="text-xs text-gray-500 ml-1">[Serves: {item.serves}]</span>
+                            <span className="text-xs text-gray-500 ml-1">
+                              [Serves: {item.serves}]
+                            </span>
                           )}
                         </p>
                         <p className="text-xs text-gray-500">
@@ -685,7 +746,9 @@ const FastFoodCatalogue: React.FC = () => {
                       >
                         <Minus size={12} />
                       </Button>
-                      <span className="w-8 text-center font-medium">{item.quantity}</span>
+                      <span className="w-8 text-center font-medium">
+                        {item.quantity}
+                      </span>
                       <Button
                         variant="outline"
                         size="icon"
@@ -713,7 +776,7 @@ const FastFoodCatalogue: React.FC = () => {
               </div>
 
               <Button
-                className="mt-3 bg-red-600 hover:bg-red-700 text-white"
+                className="mt-3 bg-green-600 hover:bg-green-700 text-white"
                 onClick={handleProceedToBuy}
               >
                 Proceed to Buy via WhatsApp
@@ -731,7 +794,9 @@ const FastFoodCatalogue: React.FC = () => {
             Order Placed!
           </DialogTitle>
           <p className="text-gray-600">
-            Your order <span className="font-semibold text-red-600">#{orderId}</span> has been sent via WhatsApp.
+            Your order{" "}
+            <span className="font-semibold text-red-600">#{orderId}</span> has
+            been sent via WhatsApp.
           </p>
           <Button
             className="mt-5 bg-red-600 hover:bg-red-700 text-white"
@@ -741,6 +806,9 @@ const FastFoodCatalogue: React.FC = () => {
           </Button>
         </DialogContent>
       </Dialog>
+      <div className="flex space-x-1 border-t border-gray-300 py-3 justify-center  text-center text-sm text-gray-500">
+        Developed by <p className="mx-1 font-bold text-yellow-700">SHIBIM</p>
+      </div>
     </section>
   );
 };
